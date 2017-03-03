@@ -62,14 +62,14 @@ def lookupDepartures(numRows,departStationCode,arriveStationCode):
                         trainServices.append(trainInfo)
                     #print ' '.join(trainInfo)
     elif departStationCode in LondonCodes or arriveStationCode in LondonCodes:
-        print '. . .'
+        print '...'
     else:
         print 'No direct trains from', crs_to_station[departStationCode], 'to', crs_to_station[arriveStationCode]
 
 # global variables
 trainServices = []
 numRows = 1000
-
+print '\n Please enter your station name. For London terminals use ''London''.'
 departStation = raw_input('\n travelling from: ')
 arriveStation = raw_input('\n travelling to: ')
 print '\n checking train times... \n'
@@ -94,6 +94,6 @@ else:
 trainServices = sorted(trainServices)
 for train in trainServices:
     print ' '.join(train)
-print '\n TRAINS! \n'
+print '\n We\'re going nowhere slowly but we\'re seeing all the sights. \n'
 
 raw_input()
