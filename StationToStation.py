@@ -49,20 +49,21 @@ def lookupDepartures(numRows,departStationCode,arriveStationCode):
             terminateStationCode = services[train].destination.location[0].crs
             terminateStationName = services[train].destination.location[0].locationName    
             departureTime = services[train].std
+            departureTimeDelay = services[train].etd
             callingPointList = services[train].subsequentCallingPoints.callingPointList[0]
             for callingPoint in range(0,len(callingPointList[0])):
                 if callingPointList.callingPoint[callingPoint].crs == arriveStationCode:
                     arrivialStationName = callingPointList.callingPoint[callingPoint].locationName
                     arrivalTime = callingPointList.callingPoint[callingPoint].st
                     if terminateStationCode == arriveStationCode:
-                        trainInfo = [departureTime, 'from', crs_to_station[departStationCode], 'to', terminateStationName, 'arriving at', arrivalTime]
+                        trainInfo = [departureTime, '[',departureTimeDelay,']','from', crs_to_station[departStationCode], 'to', terminateStationName, 'arriving at', arrivalTime]
                         trainServices.append(trainInfo)
                     else:
-                        trainInfo = [departureTime, 'from', crs_to_station[departStationCode], 'to', terminateStationName, 'calling at', arrivialStationName, 'at', arrivalTime]
+                        trainInfo = [departureTime, '[',departureTimeDelay,']', 'from', crs_to_station[departStationCode], 'to', terminateStationName, 'calling at', arrivialStationName, 'at', arrivalTime]
                         trainServices.append(trainInfo)
                     #print ' '.join(trainInfo)
     elif departStationCode in LondonCodes or arriveStationCode in LondonCodes:
-        print '...'
+		print '...'
     else:
         print 'No direct trains from', crs_to_station[departStationCode], 'to', crs_to_station[arriveStationCode]
 

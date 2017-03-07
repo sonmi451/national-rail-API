@@ -36,8 +36,9 @@ def LondonBoundDepartureTimes(stationCode):
         destinationCode = listoftrains[train].destination.location[0].crs
         destinationName = listoftrains[train].destination.location[0].locationName
         departureTime = listoftrains[train].std
+        departureTimeDelay = listoftrains[train].etd
         if destinationCode in LondonCodes:
-            trainInfo = [departureTime, stationCode, 'to', destinationName]
+            trainInfo = [departureTime, '[' , departureTimeDelay, ']', 'to', destinationName]
             #print trainInfo
             trainsToLondon.append(trainInfo)
     return trainsToLondon
@@ -54,7 +55,10 @@ numRows = 1000
 trainsToLondon = []
 
 # function call
-print '\n Surbiton: SUR, Sheffield: SHF, Barnehurst: BNH \n'
+print '\n Surbiton: SUR, Barnehurst: BNH, Theale:THE\n'
 fromStation = raw_input('departure station code: ')
 LondonBound(fromStation)
+
+print '\n We\'re going nowhere slowly but we\'re seeing all the sights. \n'
+
 raw_input()
