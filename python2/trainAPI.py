@@ -1,24 +1,27 @@
-# python 2.7
-# Accessing the Nation Rail Enquiries Live Departure Boards Web Service
-# Using the python 2.7 suds library to format and send SOAP XML messages
-# python -m pip install suds
-# Current version op Open LDBWS to be found at https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2016-02-16
-# Documentation to be found at https://lite.realtime.nationalrail.co.uk/OpenLDBWS/
-# My access token is '5f0c1463-7047-4bc2-a2f8-8ce38b3eb269' which must be transmitted in the SOAP header
+'''
+Python 2.7
+Accessing the Nation Rail Enquiries Live Departure Boards Web Service
+Using the python 2.7 suds library to format and send SOAP XML messages
+install with python -m pip install suds
 
-# query should look like this
-#b'<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:ns1="http://tha
-#lesgroup.com/RTTI/2016-02-16/ldb/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-i
-#nstance" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns0="h
-#ttp://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Header/><ns0:Body><ns1:GetDe
-#partureBoardRequest><ns1:numRows>10</ns1:numRows><ns1:crs>SUR</ns1:crs></ns1:Get
-#DepartureBoardRequest></ns0:Body></SOAP-ENV:Envelope>'
+Current version op Open LDBWS to be found at https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2016-02-16
+Documentation to be found at https://lite.realtime.nationalrail.co.uk/OpenLDBWS/
+My access token must be transmitted in the SOAP header
+
+query should look like this
+b'<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:ns1="http://tha
+lesgroup.com/RTTI/2016-02-16/ldb/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-i
+nstance" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns0="h
+ttp://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Header/><ns0:Body><ns1:GetDe
+partureBoardRequest><ns1:numRows>10</ns1:numRows><ns1:crs>SUR</ns1:crs></ns1:Get
+DepartureBoardRequest></ns0:Body></SOAP-ENV:Envelope>
+'''
 
 LondonStationCodes = {
 #London Blackfriars	BFR
 'LBG':'London Bridge',
-'CST':'London Cannon Street',	
-'CHX': 'London Charing Cross'	
+'CST':'London Cannon Street',
+'CHX': 'London Charing Cross'
 #London Euston	EUS
 #London Fenchurch Street	FST
 #London Kings Cross	KGX
@@ -46,12 +49,13 @@ from suds.sax.element import Element
 import logging
 import re
 import time
+from token import TOKEN
 
 logging.basicConfig(level=logging.INFO)
 #logging.basicConfig(level=logging.DEBUG)
 
 api = 'https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2016-02-16'
-TokenValue = Element('TokenValue').setText('5f0c1463-7047-4bc2-a2f8-8ce38b3eb269')
+TokenValue = Element('TokenValue').setText(TOKEN)
 AccessToken = Element('AccessToken')
 AccessToken.append(TokenValue)
 
@@ -70,8 +74,8 @@ def lookupDepartures(numRows,stationCode):
     #print services.subsequentCallingPoints.callingPointList[0].callingPoint[1].locationName
     #print services
     return services
-    
-   
+
+
 def LondonBoundDepartureTimes(stationCode):
     services = lookupDepartures(numRows,stationCode)
     for train in range(0,len(services)):
@@ -87,7 +91,7 @@ def LondonBoundDepartureTimes(stationCode):
 def viaBexleyheath(station):
     departingServices = lookupDepartures(numRows,station)
     for train in range(0,len(departingServices)):
-            originName = departingServices[train].origin.location[0].locationName  
+            originName = departingServices[train].origin.location[0].locationName
             destinationCode = departingServices[train].destination.location[0].crs
             destinationName = departingServices[train].destination.location[0].locationName
             departureTime = departingServices[train].std
@@ -100,11 +104,11 @@ def viaBexleyheath(station):
                     #print trainInfo
                     trainsHome.append(trainInfo)
     return trainsHome
-                    
+
 def toBarnehurst(station):
     departingServices = lookupDepartures(numRows,station)
     for train in range(0,len(departingServices)):
-            originName = departingServices[train].origin.location[0].locationName  
+            originName = departingServices[train].origin.location[0].locationName
             destinationCode = departingServices[train].destination.location[0].crs
             destinationName = departingServices[train].destination.location[0].locationName
             departureTime = departingServices[train].std
@@ -113,13 +117,13 @@ def toBarnehurst(station):
             for callingPoint in range(0,len(callingPointList[0])):
                 #print train, callingPointList.callingPoint[callingPoint].locationName
                 if callingPointList.callingPoint[callingPoint].locationName == 'Barnehurst':
-                    BarnehurstCallingNumber = callingPoint 
+                    BarnehurstCallingNumber = callingPoint
                     if hasattr(departingServices[train].destination.location[0],'via') == True:
                         via = departingServices[train].destination.location[0].via
                         trainInfo = [departureTime, LondonStationCodes[station], 'to', destinationName, via]
                         #print trainInfo
                         trainsHome.append(trainInfo)
-                    else:# destinationName != 'Barnehurst':                   
+                    else:# destinationName != 'Barnehurst':
                         trainInfo = [departureTime, LondonStationCodes[station], 'to', destinationName, 'via', callingPointList.callingPoint[BarnehurstCallingNumber-1].locationName]
                         #print trainInfo
                         trainsHome.append(trainInfo)
@@ -127,7 +131,7 @@ def toBarnehurst(station):
                     #    trainInfo = [departureTime,LondonStationCodes[station], 'to', destinationName]
                     #    trainsHome.append(trainInfo)
     return trainsHome
-  
+
 trainsHome = []
 numRows = 10000
 
@@ -141,8 +145,8 @@ def workToHome():
     for train in trainsHome:
         print ' '.join(train)
 
-    
-        
+
+
 trainsToLondon = []
 def LondonBound(fromStation):
     #fromStation = str(fromStation)

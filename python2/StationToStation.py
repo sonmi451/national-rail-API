@@ -1,20 +1,28 @@
-# python 2.7
-# Accessing the Nation Rail Enquiries Live Departure Boards Web Service
-# Using the python 2.7 suds library to format and send SOAP XML messages
-# python -m pip install suds
-# Current version op Open LDBWS to be found at https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2016-02-16
-# Documentation to be found at https://lite.realtime.nationalrail.co.uk/OpenLDBWS/
-# My access token is '5f0c1463-7047-4bc2-a2f8-8ce38b3eb269' which must be transmitted in the SOAP header
+'''
+Python 2.7
+Accessing the Nation Rail Enquiries Live Departure Boards Web Service
+Using the python 2.7 suds library to format and send SOAP XML messages
+install with python -m pip install suds
 
-# client formats the query, sends SOAP packets
-# Element adds headers to SOAP packets
-# logging allows to see what is being transmitted
+Current version op Open LDBWS to be found at https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2016-02-16
+Documentation to be found at https://lite.realtime.nationalrail.co.uk/OpenLDBWS/
+My access token must be transmitted in the SOAP header
+
+query should look like this
+b'<?xml version="1.0" encoding="UTF-8"?><SOAP-ENV:Envelope xmlns:ns1="http://tha
+lesgroup.com/RTTI/2016-02-16/ldb/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-i
+nstance" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns0="h
+ttp://schemas.xmlsoap.org/soap/envelope/"><SOAP-ENV:Header/><ns0:Body><ns1:GetDe
+partureBoardRequest><ns1:numRows>10</ns1:numRows><ns1:crs>SUR</ns1:crs></ns1:Get
+DepartureBoardRequest></ns0:Body></SOAP-ENV:Envelope>
+'''
 
 from suds.client import Client
 from suds.sax.element import Element
 import logging
 import csv
 import re
+from token import TOKEN
 
 # station crs codes
 import csv
@@ -31,7 +39,7 @@ LondonCodes = ['BFR', 'LBG', 'CST', 'CHX', 'EUS', 'FST', 'KGX', 'LST', 'MYB', 'P
 
 # SOAP details
 api = 'https://lite.realtime.nationalrail.co.uk/OpenLDBWS/wsdl.aspx?ver=2016-02-16'
-TokenValue = Element('TokenValue').setText('5f0c1463-7047-4bc2-a2f8-8ce38b3eb269')
+TokenValue = Element('TokenValue').setText(TOKEN)
 AccessToken = Element('AccessToken')
 AccessToken.append(TokenValue)
 trainDB = Client(api)
@@ -47,7 +55,7 @@ def lookupDepartures(numRows,departStationCode,arriveStationCode):
             originStationName = services[train].origin.location[0].locationName
             originStationCode = services[train].origin.location[0].crs
             terminateStationCode = services[train].destination.location[0].crs
-            terminateStationName = services[train].destination.location[0].locationName    
+            terminateStationName = services[train].destination.location[0].locationName
             departureTime = services[train].std
             departureTimeDelay = services[train].etd
             callingPointList = services[train].subsequentCallingPoints.callingPointList[0]
@@ -77,7 +85,7 @@ print '\n checking train times... \n'
 if (departStation == 'London' or departStation in station_to_crs) and (arriveStation == 'London' or arriveStation in station_to_crs):
     if departStation == 'London':
         arriveStationCode = station_to_crs[arriveStation]
-        for LondonCode in LondonCodes:          
+        for LondonCode in LondonCodes:
             lookupDepartures(numRows,LondonCode,arriveStationCode)
     elif arriveStation == 'London':
         departStationCode = station_to_crs[departStation]

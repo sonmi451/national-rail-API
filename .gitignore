@@ -1,0 +1,25 @@
+###################
+# FILES TO IGNORE #
+###################
+
+.ssh
+.bash_history
+.bash_profile
+.bash_logout
+.bashrc
+
+## OSX files
+.DS_Store
+
+## Virtual environments
+.env
+.venv
+env/
+venv/
+
+## py cache
+__pycache__/
+.cache/
+
+## ignore token file
+token.py
